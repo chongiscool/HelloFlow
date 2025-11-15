@@ -2,6 +2,7 @@ package com.example.helloflow.ui.shareflow
 
 import androidx.fragment.app.viewModels
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -42,13 +43,33 @@ class ShareFlowFragment : Fragment() {
         val btnClear = view.findViewById<TextView>(R.id.btn_clear)
         val btnConfirm = view.findViewById<TextView>(R.id.btn_confirm)
 
+        fun showMsg(x: Any): Unit {
+            tvShow.text = "收到🫡：$x"
+        }
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.events.collect { event ->
-                    // make a toast to show event value
-                    Toast.makeText(requireContext(), event.toString(), Toast.LENGTH_SHORT).show()
+                launch {
+                    viewModel.events.collect { event ->
+                        // make a toast to show event value
+                        Toast.makeText(requireContext(), event.toString(), Toast.LENGTH_SHORT).show()
+                    }
                 }
+
+                launch {
+                    viewModel.events.collect { event ->
+                        showMsg(event.toString())
+                    }
+                }
+
+                launch {
+                    viewModel.events.collect { event ->
+                       Log.d("ShareFlowFragment", "event: $event")
+                    }
+                }
+
             }
+
+
         }
 
         btnClear.setOnClickListener {
@@ -63,5 +84,7 @@ class ShareFlowFragment : Fragment() {
 
 
     }
+
+
 
 }
