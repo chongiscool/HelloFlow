@@ -29,6 +29,7 @@ class StateFlowFragment : Fragment() {
         fun newInstance() = StateFlowFragment()
     }
 
+
     private val viewModel: MyStateFlowViewModel by viewModels()
     private val loginViewModel: LoginViewModel by viewModels()
 
@@ -48,11 +49,14 @@ class StateFlowFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val tvShow = requireView().findViewById<TextView>(R.id.tv_msg)
+        val tvTrafficLight = requireView().findViewById<TextView>(R.id.tv_light)
         val btnConfirm = requireView().findViewById<Button>(R.id.btn_confirm)
         val btnCancel = requireView().findViewById<Button>(R.id.btn_cancel)
+        val btnChangeLight = requireView().findViewById<Button>(R.id.btn_change_light)
         val progressBar = requireView().findViewById<ProgressBar>(R.id.progressBar)
         val etUsername = requireView().findViewById<EditText>(R.id.et_username)
         val btnLogin = requireView().findViewById<Button>(R.id.btn_login)
+        val btnStartRunning = requireView().findViewById<Button>(R.id.btn_start_running)
 
         // 触发登录
         btnConfirm.setOnClickListener {
@@ -64,6 +68,41 @@ class StateFlowFragment : Fragment() {
         btnCancel.setOnClickListener {
 //            viewModel.reset()
             viewModel.resetLiveCount()
+        }
+
+        // 换灯
+        btnChangeLight.setOnClickListener {
+            viewModel.next()
+        }
+
+        btnStartRunning.setOnClickListener {
+            viewModel.startRunning()
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { uiState ->
+                    tvShow.text = when(uiState) {
+                        is UiState.Idle -> "当前：空闲"
+                        is UiState.Running -> "当前：运行中"
+                        is UiState.Finished -> "当前：已完成"
+                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.trafficLightState.collect { lightState ->
+                    tvTrafficLight.text = when(lightState) {
+                        TrafficLightState.Red -> "红灯"
+                        TrafficLightState.Yellow -> "黄灯"
+                        TrafficLightState.Green -> "绿灯"
+                        TrafficLightState.Blinking -> "黄灯(闪烁)"
+                    }
+                }
+
+            }
         }
 
         // ------------------ 收集 StateFlow (持续状态) ------------------

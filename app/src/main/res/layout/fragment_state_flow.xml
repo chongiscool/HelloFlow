@@ -19,6 +19,46 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/tv_running_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        app:layout_constraintBottom_toTopOf="@id/tv_light"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/tv_light"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_start_running"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开始运行"
+        app:layout_constraintBottom_toTopOf="@id/btn_change_light"
+        app:layout_constraintStart_toStartOf="@id/btn_change_light"
+        app:layout_constraintEnd_toEndOf="@id/btn_change_light"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/btn_change_light"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="换灯💡"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_confirm"
+        app:layout_constraintEnd_toStartOf="@id/btn_cancel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/btn_confirm"
+        app:layout_constraintVertical_bias="0.0" />
+
     <Button
         android:id="@+id/btn_cancel"
         android:layout_width="wrap_content"
@@ -26,7 +66,6 @@
         android:text="重置"
         app:layout_constraintBottom_toBottomOf="@+id/btn_confirm"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.622"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/btn_confirm"
         app:layout_constraintVertical_bias="0.0" />
@@ -38,10 +77,10 @@
         android:text="+1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.95"
+        app:layout_constraintHorizontal_bias="0.9"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.98" />
+        app:layout_constraintVertical_bias="0.9" />
 
     <ProgressBar
         android:id="@+id/progressBar"
