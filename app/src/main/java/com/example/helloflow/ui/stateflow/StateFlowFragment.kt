@@ -89,6 +89,7 @@ class StateFlowFragment : Fragment() {
             }
         }
 
+        // 当 et 文本有变化时，就会自动将变化后的 text 传递给下方
         etUsername.doOnTextChanged { text,_,_,_ ->
             loginViewModel.onUsernameChanged(text.toString())
         }
