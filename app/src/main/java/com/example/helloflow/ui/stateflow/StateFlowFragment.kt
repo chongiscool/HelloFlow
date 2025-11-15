@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 
@@ -53,6 +54,18 @@ class StateFlowFragment : Fragment() {
         val etUsername = requireView().findViewById<EditText>(R.id.et_username)
         val btnLogin = requireView().findViewById<Button>(R.id.btn_login)
 
+        // 触发登录
+        btnConfirm.setOnClickListener {
+//            viewModel.increment()
+            viewModel.incrementLiveCount()
+        }
+
+        // 重置
+        btnCancel.setOnClickListener {
+//            viewModel.reset()
+            viewModel.resetLiveCount()
+        }
+
         // ------------------ 收集 StateFlow (持续状态) ------------------
         // StateFlow 收集示例：更新 UI 状态 (如错误提示、按钮状态)
         viewLifecycleOwner.lifecycleScope.launch {
@@ -80,6 +93,7 @@ class StateFlowFragment : Fragment() {
                             // 登录成功，执行导航操作，**只执行一次**
                             showShortToast("登录成功！")
                         }
+
                         is LoginEvent.Error -> {
                             // 登录失败，显示 SnackBar，**只显示一次**
                             showLongToast("登录失败!")
@@ -90,28 +104,27 @@ class StateFlowFragment : Fragment() {
         }
 
         // 当 et 文本有变化时，就会自动将变化后的 text 传递给下方
-        etUsername.doOnTextChanged { text,_,_,_ ->
+        etUsername.doOnTextChanged { text, _, _, _ ->
             loginViewModel.onUsernameChanged(text.toString())
         }
 
-        // 触发登录
-        btnConfirm.setOnClickListener {
-            viewModel.increment()
-        }
+        // 使用携程来收集
+//        viewLifecycleOwner.lifecycleScope.launch {
+//            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+//                viewModel.count.collect { tvShow.text = it.toString() }
+//            }
+//        }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.count.collect { tvShow.text = it.toString() }
-            }
+        // LiveData 本身具备生命周期感知能力，这里直接观察即可。
+        viewModel.liveCount.observe(viewLifecycleOwner) { count ->
+            tvShow.text = count.toString()
         }
 
         btnLogin.setOnClickListener {
             loginViewModel.login()
         }
 
-        btnCancel.setOnClickListener {
-            viewModel.reset()
-        }
+
     }
 
 }
