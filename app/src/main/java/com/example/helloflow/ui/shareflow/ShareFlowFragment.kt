@@ -7,13 +7,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 
 import com.example.helloflow.R
+import com.example.helloflow.ui.showShortToast
 import kotlinx.coroutines.launch
 
 class ShareFlowFragment : Fragment() {
@@ -42,6 +43,8 @@ class ShareFlowFragment : Fragment() {
         val tvShow = view.findViewById<TextView>(R.id.tv_msg)
         val btnClear = view.findViewById<TextView>(R.id.btn_clear)
         val btnConfirm = view.findViewById<TextView>(R.id.btn_confirm)
+        val pbLoading = view.findViewById<ProgressBar>(R.id.pb_shared)
+
 
         fun showMsg(x: Any): Unit {
             tvShow.text = "收到🫡：$x"
@@ -51,7 +54,7 @@ class ShareFlowFragment : Fragment() {
                 launch {
                     viewModel.events.collect { event ->
                         // make a toast to show event value
-                        Toast.makeText(requireContext(), event.toString(), Toast.LENGTH_SHORT).show()
+                        showShortToast(event.toString())
                     }
                 }
 
@@ -81,8 +84,31 @@ class ShareFlowFragment : Fragment() {
         }
 
 
+        collectUiEvent(progressBar = pbLoading)
 
+    }
 
+    fun collectUiEvent(progressBar: ProgressBar): Unit {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiEvents.collect { event ->
+                    when(event) {
+                        is UiEvent.showLoading -> {
+                            progressBar.visibility = View.VISIBLE
+                        }
+                        is UiEvent.hideLoading -> {
+                            progressBar.visibility = View.GONE
+                        }
+                        is UiEvent.ShowToast -> {
+                            showShortToast(event.message)
+                        }
+                        else -> {
+                            showShortToast("NavigationToDetailPage: Not implement yet")
+                        }
+                    }
+                }
+            }
+        }
     }
 
 
