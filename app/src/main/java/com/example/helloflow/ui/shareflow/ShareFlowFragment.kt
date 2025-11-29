@@ -21,9 +21,13 @@ class ShareFlowFragment : Fragment() {
 
     companion object {
         fun newInstance() = ShareFlowFragment()
+        const val TAG = "ShareFlowFragment"
     }
 
     private val viewModel: ShareFlowViewModel by viewModels()
+    private val timerViewModel: TimerViewModel by viewModels()
+
+    private lateinit var tvShow: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,15 +44,33 @@ class ShareFlowFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val tvShow = view.findViewById<TextView>(R.id.tv_msg)
+        tvShow = view.findViewById<TextView>(R.id.tv_msg)
+        val tvCounter = view.findViewById<TextView>(R.id.tv_counter)
         val btnClear = view.findViewById<TextView>(R.id.btn_clear)
         val btnConfirm = view.findViewById<TextView>(R.id.btn_confirm)
         val pbLoading = view.findViewById<ProgressBar>(R.id.pb_shared)
 
+        collectMultiSubscriptions()
 
-        fun showMsg(x: Any): Unit {
-            tvShow.text = "收到🫡：$x"
+        btnClear.setOnClickListener {
+            tvShow.text = ""
         }
+
+        btnConfirm.setOnClickListener {
+            viewModel.onButtonClick()
+        }
+
+        collectUiEvent(progressBar = pbLoading)
+
+        collectCounter(tvCounter)
+
+    }
+
+    private fun showMsg(x: Any) {
+        tvShow.text = "收到🫡：$x"
+    }
+
+    fun collectMultiSubscriptions() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
@@ -66,26 +88,31 @@ class ShareFlowFragment : Fragment() {
 
                 launch {
                     viewModel.events.collect { event ->
-                       Log.d("ShareFlowFragment", "event: $event")
+                        Log.d(TAG, "event: $event")
                     }
                 }
 
             }
 
-
         }
+    }
 
-        btnClear.setOnClickListener {
-            tvShow.text = ""
+    fun collectCounter(tvCounter: TextView) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    timerViewModel.counter.collect { counter ->
+                        tvCounter.text = counter.toString()
+                    }
+                }
+
+                launch {
+                    timerViewModel.counter.collect { counter ->
+                        Log.d(TAG, "counter: $counter")
+                    }
+                }
+            }
         }
-
-        btnConfirm.setOnClickListener {
-            viewModel.onButtonClick()
-        }
-
-
-        collectUiEvent(progressBar = pbLoading)
-
     }
 
     fun collectUiEvent(progressBar: ProgressBar): Unit {
@@ -110,7 +137,5 @@ class ShareFlowFragment : Fragment() {
             }
         }
     }
-
-
 
 }
