@@ -33,6 +33,9 @@ class StateFlowFragment : Fragment() {
     private val viewModel: MyStateFlowViewModel by viewModels()
     private val loginViewModel: LoginViewModel by viewModels()
 
+    private val counterViewModel: CounterViewModel by viewModels()
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -49,6 +52,7 @@ class StateFlowFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val tvShow = requireView().findViewById<TextView>(R.id.tv_msg)
+        val tvCounter = requireView().findViewById<TextView>(R.id.tv_counter)
         val tvTrafficLight = requireView().findViewById<TextView>(R.id.tv_light)
         val btnConfirm = requireView().findViewById<Button>(R.id.btn_confirm)
         val btnCancel = requireView().findViewById<Button>(R.id.btn_cancel)
@@ -161,6 +165,15 @@ class StateFlowFragment : Fragment() {
 
         btnLogin.setOnClickListener {
             loginViewModel.login()
+        }
+
+        // 在 started 之后收集，stopped 时自动取消
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                counterViewModel.uiState.collect { uiState ->
+                    tvCounter.text = uiState.toString()
+                }
+            }
         }
 
 
