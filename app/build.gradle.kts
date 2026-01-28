@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -26,6 +27,12 @@ android {
             )
         }
     }
+    buildFeatures {
+        // 开启 Compose 支持，便于在 xml 中嵌入 ComposeView
+        compose = true
+        // if you are using data binding, keep it as well
+        // dataBinding = true
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -36,6 +43,27 @@ android {
 }
 
 dependencies {
+    val composeBom = platform(libs.androidx.compose.bom)
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    debugImplementation(libs.androidx.compose.ui.tooling)
+
+    // UI Tests
+//    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+//    debugImplementation("androidx.compose.ui:ui-test-manifest")
+//
+//    // Optional - Add window size utils
+//    implementation("androidx.compose.material3.adaptive:adaptive")
+
+    // Optional - Integration with activities
+//    implementation("androidx.activity:activity-compose:1.11.0")
+//    // Optional - Integration with ViewModels
+//    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
+//    // Optional - Integration with LiveData
+//    implementation("androidx.compose.runtime:runtime-livedata")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
